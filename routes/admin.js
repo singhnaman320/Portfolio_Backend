@@ -1,13 +1,11 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const auth = require('../middleware/auth');
-const upload = require('../middleware/upload');
 const About = require('../models/About');
 const Project = require('../models/Project');
 const Experience = require('../models/Experience');
 const Skill = require('../models/Skill');
 const Contact = require('../models/Contact');
-const { transformImageUrls } = require('../utils/urlHelper');
 
 const router = express.Router();
 
@@ -22,13 +20,7 @@ router.use(auth);
 router.get('/home', async (req, res) => {
   try {
     const about = await About.findOne({ isActive: true });
-    if (!about) {
-      return res.json({});
-    }
-    
-    // Transform image URLs to full URLs
-    const transformedAbout = transformImageUrls(about, ['profileImage'], req);
-    res.json(transformedAbout);
+    res.json(about || {});
   } catch (error) {
     console.error('Get about error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -38,10 +30,7 @@ router.get('/home', async (req, res) => {
 // @route   POST /api/admin/home
 // @desc    Create or update home page information (about data)
 // @access  Private
-router.post('/home', upload.fields([
-  { name: 'profileImage', maxCount: 1 },
-  { name: 'resume', maxCount: 1 }
-]), [
+router.post('/home', [
   body('name').trim().isLength({ min: 2 }).withMessage('Name is required'),
   body('title').trim().isLength({ min: 2 }).withMessage('Title is required'),
   body('tagline').trim().isLength({ min: 5 }).withMessage('Tagline is required'),
@@ -64,18 +53,10 @@ router.post('/home', upload.fields([
       tagline,
       bio,
       socialLinks: socialLinks ? JSON.parse(socialLinks) : {},
-      highlights: highlights ? JSON.parse(highlights) : []
+      highlights: highlights ? JSON.parse(highlights) : [],
+      profileImage: '/images/profile.jpg',
+      resumeUrl: '/documents/resume.pdf'
     };
-
-    // Handle file uploads
-    if (req.files) {
-      if (req.files.profileImage) {
-        aboutData.profileImage = `/uploads/profile/${req.files.profileImage[0].filename}`;
-      }
-      if (req.files.resume) {
-        aboutData.resumeUrl = `/uploads/documents/${req.files.resume[0].filename}`;
-      }
-    }
 
     // Update existing or create new
     let about = await About.findOne({ isActive: true });
@@ -87,9 +68,7 @@ router.post('/home', upload.fields([
       await about.save();
     }
 
-    // Transform image URLs in response
-    const transformedAbout = transformImageUrls(about, ['profileImage'], req);
-    res.json({ message: 'About information updated successfully', about: transformedAbout });
+    res.json({ message: 'About information updated successfully', about });
   } catch (error) {
     console.error('Update about error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -114,7 +93,7 @@ router.get('/projects', async (req, res) => {
 // @route   POST /api/admin/projects
 // @desc    Create new project
 // @access  Private
-router.post('/projects', upload.array('projectImages', 5), [
+router.post('/projects', [
   body('title').trim().isLength({ min: 2 }).withMessage('Title is required'),
   body('description').trim().isLength({ min: 10 }).withMessage('Description is required'),
   body('problemStatement').trim().isLength({ min: 10 }).withMessage('Problem statement is required'),
@@ -147,13 +126,7 @@ router.post('/projects', upload.array('projectImages', 5), [
       order: parseInt(order) || 0
     };
 
-    // Handle image uploads
-    if (req.files && req.files.length > 0) {
-      projectData.images = req.files.map(file => ({
-        url: `/uploads/projects/${file.filename}`,
-        caption: ''
-      }));
-    }
+    // No image uploads - using static images or external URLs
 
     const project = new Project(projectData);
     await project.save();
@@ -168,7 +141,7 @@ router.post('/projects', upload.array('projectImages', 5), [
 // @route   PUT /api/admin/projects/:id
 // @desc    Update project
 // @access  Private
-router.put('/projects/:id', upload.array('projectImages', 5), async (req, res) => {
+router.put('/projects/:id', async (req, res) => {
   try {
     const project = await Project.findById(req.params.id);
     if (!project) {
@@ -193,14 +166,7 @@ router.put('/projects/:id', upload.array('projectImages', 5), async (req, res) =
       order: parseInt(order) || project.order
     };
 
-    // Handle new image uploads
-    if (req.files && req.files.length > 0) {
-      const newImages = req.files.map(file => ({
-        url: `/uploads/projects/${file.filename}`,
-        caption: ''
-      }));
-      updateData.images = [...(project.images || []), ...newImages];
-    }
+    // No image uploads - using static images or external URLs
 
     Object.assign(project, updateData);
     await project.save();
@@ -250,7 +216,7 @@ router.get('/experiences', async (req, res) => {
 // @route   POST /api/admin/experiences
 // @desc    Create new experience
 // @access  Private
-router.post('/experiences', upload.single('companyLogo'), [
+router.post('/experiences', [
   body('company').trim().isLength({ min: 2 }).withMessage('Company name is required'),
   body('position').trim().isLength({ min: 2 }).withMessage('Position is required'),
   body('location').trim().isLength({ min: 2 }).withMessage('Location is required'),
@@ -283,10 +249,7 @@ router.post('/experiences', upload.single('companyLogo'), [
       order: parseInt(order) || 0
     };
 
-    // Handle logo upload
-    if (req.file) {
-      experienceData.companyLogo = `/uploads/companies/${req.file.filename}`;
-    }
+    // No logo uploads - using static images or external URLs
 
     const experience = new Experience(experienceData);
     await experience.save();
@@ -301,7 +264,7 @@ router.post('/experiences', upload.single('companyLogo'), [
 // @route   PUT /api/admin/experiences/:id
 // @desc    Update experience
 // @access  Private
-router.put('/experiences/:id', upload.single('companyLogo'), async (req, res) => {
+router.put('/experiences/:id', async (req, res) => {
   try {
     const experience = await Experience.findById(req.params.id);
     if (!experience) {
@@ -325,10 +288,7 @@ router.put('/experiences/:id', upload.single('companyLogo'), async (req, res) =>
       order: parseInt(order) || experience.order
     };
 
-    // Handle logo upload
-    if (req.file) {
-      updateData.companyLogo = `/uploads/companies/${req.file.filename}`;
-    }
+    // No logo uploads - using static images or external URLs
 
     Object.assign(experience, updateData);
     await experience.save();

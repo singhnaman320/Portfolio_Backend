@@ -3,10 +3,19 @@ const path = require('path');
 const fs = require('fs');
 
 // Ensure uploads directory exists
-const uploadsDir = 'uploads';
+const uploadsDir = path.join(__dirname, '..', 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
+
+// Create subdirectories
+const subdirs = ['profile', 'projects', 'companies', 'documents', 'blog', 'misc'];
+subdirs.forEach(dir => {
+  const dirPath = path.join(uploadsDir, dir);
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+});
 
 // Configure storage
 const storage = multer.diskStorage({

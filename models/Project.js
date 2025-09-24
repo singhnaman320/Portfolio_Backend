@@ -34,10 +34,10 @@ const projectSchema = new mongoose.Schema({
     }],
     description: String
   },
-  images: [{
-    url: String,
-    caption: String
-  }],
+  image: {
+    type: String,
+    default: '/images/default-profile.jpg'
+  },
   links: {
     github: { type: String, default: '' },
     live: { type: String, default: '' },

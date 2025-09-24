@@ -22,11 +22,11 @@ const aboutSchema = new mongoose.Schema({
   },
   profileImage: {
     type: String,
-    default: ''
+    default: '/images/default-profile.jpg'
   },
   resumeUrl: {
     type: String,
-    default: ''
+    default: '/documents/naman-singh-resume.pdf'
   },
   socialLinks: {
     github: { type: String, default: '' },

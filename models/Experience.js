@@ -38,7 +38,7 @@ const experienceSchema = new mongoose.Schema({
   }],
   companyLogo: {
     type: String,
-    default: ''
+    default: '/images/default-profile.jpg'
   },
   order: {
     type: Number,
