@@ -5,6 +5,7 @@ const Project = require('../models/Project');
 const Experience = require('../models/Experience');
 const Skill = require('../models/Skill');
 const Contact = require('../models/Contact');
+const { transformImageUrls } = require('../utils/urlHelper');
 
 const router = express.Router();
 
@@ -14,7 +15,13 @@ const router = express.Router();
 router.get('/about', async (req, res) => {
   try {
     const about = await About.findOne({ isActive: true });
-    res.json(about || {});
+    if (!about) {
+      return res.json({});
+    }
+    
+    // Transform image URLs to full URLs
+    const transformedAbout = transformImageUrls(about, ['profileImage'], req);
+    res.json(transformedAbout);
   } catch (error) {
     console.error('Get about error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -37,7 +44,12 @@ router.get('/projects', async (req, res) => {
       .sort({ order: 1, createdAt: -1 })
       .select('-isActive');
     
-    res.json(projects);
+    // Transform image URLs for all projects
+    const transformedProjects = projects.map(project => 
+      transformImageUrls(project, ['image'], req)
+    );
+    
+    res.json(transformedProjects);
   } catch (error) {
     console.error('Get projects error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -58,7 +70,9 @@ router.get('/projects/:id', async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    res.json(project);
+    // Transform image URLs
+    const transformedProject = transformImageUrls(project, ['image'], req);
+    res.json(transformedProject);
   } catch (error) {
     console.error('Get project error:', error);
     res.status(500).json({ message: 'Server error' });

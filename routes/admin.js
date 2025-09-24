@@ -7,6 +7,7 @@ const Project = require('../models/Project');
 const Experience = require('../models/Experience');
 const Skill = require('../models/Skill');
 const Contact = require('../models/Contact');
+const { transformImageUrls } = require('../utils/urlHelper');
 
 const router = express.Router();
 
@@ -21,7 +22,13 @@ router.use(auth);
 router.get('/home', async (req, res) => {
   try {
     const about = await About.findOne({ isActive: true });
-    res.json(about || {});
+    if (!about) {
+      return res.json({});
+    }
+    
+    // Transform image URLs to full URLs
+    const transformedAbout = transformImageUrls(about, ['profileImage'], req);
+    res.json(transformedAbout);
   } catch (error) {
     console.error('Get about error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -80,7 +87,9 @@ router.post('/home', upload.fields([
       await about.save();
     }
 
-    res.json({ message: 'About information updated successfully', about });
+    // Transform image URLs in response
+    const transformedAbout = transformImageUrls(about, ['profileImage'], req);
+    res.json({ message: 'About information updated successfully', about: transformedAbout });
   } catch (error) {
     console.error('Update about error:', error);
     res.status(500).json({ message: 'Server error' });
