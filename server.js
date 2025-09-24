@@ -20,8 +20,8 @@ app.use(limiter);
 // CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://portfolio-frontend-seven-omega.vercel.app'] 
-    : ['http://localhost:3000', 'http://localhost:5173', 'https://portfolio-frontend-seven-omega.vercel.app'],
+    ? ['https://naman-singh-portfolio.vercel.app/'] 
+    : ['http://localhost:3000', 'http://localhost:5173', 'https://naman-singh-portfolio.vercel.app'],
   credentials: true
 }));
 
