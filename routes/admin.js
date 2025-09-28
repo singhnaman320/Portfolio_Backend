@@ -37,25 +37,28 @@ router.post('/home', [
   body('bio').trim().isLength({ min: 10 }).withMessage('Bio must be at least 10 characters')
 ], async (req, res) => {
   try {
+    console.log('Received home data:', req.body);
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({ 
         message: 'Validation failed', 
         errors: errors.array() 
       });
     }
 
-    const { name, title, tagline, bio, socialLinks, highlights } = req.body;
+    const { name, title, tagline, bio } = req.body;
     
     const homeData = {
       name,
       title,
       tagline,
       bio,
-      socialLinks: socialLinks ? JSON.parse(socialLinks) : {},
-      highlights: highlights ? JSON.parse(highlights) : [],
-      profileImage: '/images/profile.jpg',
-      resumeUrl: '/documents/resume.pdf'
+      socialLinks: {},
+      highlights: [],
+      profileImage: '/images/default-profile.jpg',
+      resumeUrl: '/documents/naman-singh-resume.pdf'
     };
 
     // Update existing or create new
