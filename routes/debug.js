@@ -27,7 +27,7 @@ router.get('/status', (req, res) => {
 router.post('/create-uploads', (req, res) => {
   try {
     const uploadsPath = path.join(__dirname, '..', 'uploads');
-    const subdirs = ['profile', 'projects', 'companies', 'documents', 'blog', 'misc'];
+    const subdirs = ['profile', 'projects', 'companies', 'documents', 'misc'];
     
     // Create main uploads directory
     if (!fs.existsSync(uploadsPath)) {

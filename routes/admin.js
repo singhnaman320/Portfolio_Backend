@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const auth = require('../middleware/auth');
-const About = require('../models/About');
+const Home = require('../models/Home');
 const Project = require('../models/Project');
 const Experience = require('../models/Experience');
 const Skill = require('../models/Skill');
@@ -15,20 +15,20 @@ router.use(auth);
 // ============ HOME PAGE ROUTES ============
 
 // @route   GET /api/admin/home
-// @desc    Get home page information (about data)
+// @desc    Get home page information
 // @access  Private
 router.get('/home', async (req, res) => {
   try {
-    const about = await About.findOne({ isActive: true });
-    res.json(about || {});
+    const home = await Home.findOne({ isActive: true });
+    res.json(home || {});
   } catch (error) {
-    console.error('Get about error:', error);
+    console.error('Get home error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
 // @route   POST /api/admin/home
-// @desc    Create or update home page information (about data)
+// @desc    Create or update home page information
 // @access  Private
 router.post('/home', [
   body('name').trim().isLength({ min: 2 }).withMessage('Name is required'),
@@ -47,7 +47,7 @@ router.post('/home', [
 
     const { name, title, tagline, bio, socialLinks, highlights } = req.body;
     
-    const aboutData = {
+    const homeData = {
       name,
       title,
       tagline,
@@ -59,18 +59,18 @@ router.post('/home', [
     };
 
     // Update existing or create new
-    let about = await About.findOne({ isActive: true });
-    if (about) {
-      Object.assign(about, aboutData);
-      await about.save();
+    let home = await Home.findOne({ isActive: true });
+    if (home) {
+      Object.assign(home, homeData);
+      await home.save();
     } else {
-      about = new About(aboutData);
-      await about.save();
+      home = new Home(homeData);
+      await home.save();
     }
 
-    res.json({ message: 'About information updated successfully', about });
+    res.json({ message: 'Home information updated successfully', home });
   } catch (error) {
-    console.error('Update about error:', error);
+    console.error('Update home error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

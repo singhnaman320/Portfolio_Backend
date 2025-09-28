@@ -9,7 +9,7 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // Create subdirectories
-const subdirs = ['profile', 'projects', 'companies', 'documents', 'blog', 'misc'];
+const subdirs = ['profile', 'projects', 'companies', 'documents', 'misc'];
 subdirs.forEach(dir => {
   const dirPath = path.join(uploadsDir, dir);
   if (!fs.existsSync(dirPath)) {
@@ -31,8 +31,6 @@ const storage = multer.diskStorage({
       uploadPath += 'companies/';
     } else if (file.fieldname === 'resume') {
       uploadPath += 'documents/';
-    } else if (file.fieldname === 'blogImage') {
-      uploadPath += 'blog/';
     } else {
       uploadPath += 'misc/';
     }

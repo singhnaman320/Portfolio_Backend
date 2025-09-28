@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const aboutSchema = new mongoose.Schema({
+const homeSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -31,7 +31,7 @@ const aboutSchema = new mongoose.Schema({
   socialLinks: {
     github: { type: String, default: '' },
     linkedin: { type: String, default: '' },
-    twitter: { type: String, default: '' },
+    instagram: { type: String, default: '' },
     leetcode: { type: String, default: '' },
     codeforces: { type: String, default: '' }
   },
@@ -47,4 +47,4 @@ const aboutSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('About', aboutSchema);
+module.exports = mongoose.model('Home', homeSchema);

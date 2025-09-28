@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const About = require('../models/About');
+const Home = require('../models/Home');
 const Project = require('../models/Project');
 const Experience = require('../models/Experience');
 const Skill = require('../models/Skill');
@@ -8,15 +8,15 @@ const Contact = require('../models/Contact');
 
 const router = express.Router();
 
-// @route   GET /api/public/about
-// @desc    Get about information
+// @route   GET /api/public/home
+// @desc    Get home information
 // @access  Public
-router.get('/about', async (req, res) => {
+router.get('/home', async (req, res) => {
   try {
-    const about = await About.findOne({ isActive: true }).lean();
-    res.json(about || {});
+    const home = await Home.findOne({ isActive: true }).lean();
+    res.json(home || {});
   } catch (error) {
-    console.error('Get about error:', error);
+    console.error('Get home error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
