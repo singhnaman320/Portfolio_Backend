@@ -3,6 +3,12 @@ const Admin = require('../models/Admin');
 
 const auth = async (req, res, next) => {
   try {
+    // Simple development bypass - no env variables needed
+    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+      req.admin = { id: 'dev-admin', name: 'Dev Admin', email: 'dev@example.com' };
+      return next();
+    }
+
     const token = req.header('Authorization')?.replace('Bearer ', '');
     
     if (!token) {
