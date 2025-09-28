@@ -104,13 +104,16 @@ router.get('/projects', async (req, res) => {
 // @access  Private
 router.post('/projects', [
   body('title').trim().isLength({ min: 2 }).withMessage('Title is required'),
-  body('description').trim().isLength({ min: 10 }).withMessage('Description is required'),
+  body('shortDescription').trim().isLength({ min: 10 }).withMessage('Short description is required'),
   body('problemStatement').trim().isLength({ min: 10 }).withMessage('Problem statement is required'),
-  body('role').trim().isLength({ min: 5 }).withMessage('Role is required')
+  body('role').trim().isLength({ min: 2 }).withMessage('Role is required')
 ], async (req, res) => {
   try {
+    console.log('Received project data:', req.body);
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({ 
         message: 'Validation failed', 
         errors: errors.array() 
@@ -118,21 +121,22 @@ router.post('/projects', [
     }
 
     const { 
-      title, description, problemStatement, techStack, role, 
-      challenges, impact, links, featured, order 
+      title, shortDescription, problemStatement, techStack, role, 
+      implementationDetails, results, githubUrl, liveUrl, featured 
     } = req.body;
 
     const projectData = {
       title,
-      description,
+      shortDescription,
       problemStatement,
-      techStack: techStack ? JSON.parse(techStack) : [],
+      techStack: Array.isArray(techStack) ? techStack : [],
       role,
-      challenges: challenges ? JSON.parse(challenges) : [],
-      impact: impact ? JSON.parse(impact) : {},
-      links: links ? JSON.parse(links) : {},
-      featured: featured === 'true',
-      order: parseInt(order) || 0
+      implementationDetails: Array.isArray(implementationDetails) ? implementationDetails : [],
+      results: Array.isArray(results) ? results : [],
+      githubUrl: githubUrl || '',
+      liveUrl: liveUrl || '',
+      featured: Boolean(featured),
+      order: 0
     };
 
     // No image uploads - using static images or external URLs
@@ -158,21 +162,22 @@ router.put('/projects/:id', async (req, res) => {
     }
 
     const { 
-      title, description, problemStatement, techStack, role, 
-      challenges, impact, links, featured, order 
+      title, shortDescription, problemStatement, techStack, role, 
+      implementationDetails, results, githubUrl, liveUrl, featured 
     } = req.body;
 
     const updateData = {
       title,
-      description,
+      shortDescription,
       problemStatement,
-      techStack: techStack ? JSON.parse(techStack) : project.techStack,
+      techStack: Array.isArray(techStack) ? techStack : project.techStack,
       role,
-      challenges: challenges ? JSON.parse(challenges) : project.challenges,
-      impact: impact ? JSON.parse(impact) : project.impact,
-      links: links ? JSON.parse(links) : project.links,
-      featured: featured === 'true',
-      order: parseInt(order) || project.order
+      implementationDetails: Array.isArray(implementationDetails) ? implementationDetails : project.implementationDetails,
+      results: Array.isArray(results) ? results : project.results,
+      githubUrl: githubUrl || project.githubUrl,
+      liveUrl: liveUrl || project.liveUrl,
+      featured: Boolean(featured),
+      order: project.order
     };
 
     // No image uploads - using static images or external URLs

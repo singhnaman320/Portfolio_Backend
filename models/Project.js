@@ -6,7 +6,7 @@ const projectSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  description: {
+  shortDescription: {
     type: String,
     required: true
   },
@@ -16,32 +16,31 @@ const projectSchema = new mongoose.Schema({
   },
   techStack: [{
     type: String,
-    required: true,
     trim: true
   }],
   role: {
     type: String,
     required: true
   },
-  challenges: [{
+  implementationDetails: [{
     type: String,
     trim: true
   }],
-  impact: {
-    metrics: [{
-      label: String,
-      value: String
-    }],
-    description: String
+  results: [{
+    type: String,
+    trim: true
+  }],
+  githubUrl: {
+    type: String,
+    default: ''
+  },
+  liveUrl: {
+    type: String,
+    default: ''
   },
   image: {
     type: String,
-    default: '/images/default-profile.jpg'
-  },
-  links: {
-    github: { type: String, default: '' },
-    live: { type: String, default: '' },
-    demo: { type: String, default: '' }
+    default: '/images/default-project.jpg'
   },
   featured: {
     type: Boolean,
