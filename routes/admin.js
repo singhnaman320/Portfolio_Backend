@@ -31,13 +31,19 @@ router.get('/home', async (req, res) => {
 // @desc    Create or update home page information
 // @access  Private
 router.post('/home', [
-  body('name').trim().isLength({ min: 2 }).withMessage('Name is required'),
-  body('title').trim().isLength({ min: 2 }).withMessage('Title is required'),
-  body('tagline').trim().isLength({ min: 5 }).withMessage('Tagline is required'),
-  body('bio').trim().isLength({ min: 10 }).withMessage('Bio must be at least 10 characters')
+  body('name').notEmpty().withMessage('Name is required').trim().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
+  body('title').notEmpty().withMessage('Title is required').trim().isLength({ min: 2 }).withMessage('Title must be at least 2 characters'),
+  body('tagline').notEmpty().withMessage('Tagline is required').trim().isLength({ min: 5 }).withMessage('Tagline must be at least 5 characters'),
+  body('bio').notEmpty().withMessage('Bio is required').trim().isLength({ min: 10 }).withMessage('Bio must be at least 10 characters')
 ], async (req, res) => {
   try {
     console.log('Received home data:', req.body);
+    console.log('Field lengths:', {
+      name: req.body.name?.length,
+      title: req.body.title?.length,
+      tagline: req.body.tagline?.length,
+      bio: req.body.bio?.length
+    });
     
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
