@@ -233,9 +233,10 @@ router.get('/experiences', async (req, res) => {
 router.post('/experiences', [
   body('company').trim().isLength({ min: 2 }).withMessage('Company name is required'),
   body('position').trim().isLength({ min: 2 }).withMessage('Position is required'),
-  body('location').trim().isLength({ min: 2 }).withMessage('Location is required'),
-  body('startDate').isISO8601().withMessage('Valid start date is required'),
-  body('description').trim().isLength({ min: 10 }).withMessage('Description is required')
+  body('location').optional().trim(),
+  body('startDate').trim().isLength({ min: 1 }).withMessage('Start date is required'),
+  body('endDate').optional().trim(),
+  body('description').optional().trim()
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -254,10 +255,10 @@ router.post('/experiences', [
     const experienceData = {
       company,
       position,
-      location,
-      startDate: new Date(startDate),
-      endDate: endDate ? new Date(endDate) : null,
-      description,
+      location: location || '',
+      startDate: startDate, // Keep as string
+      endDate: endDate || '',
+      description: description || '',
       achievements: achievements ? JSON.parse(achievements) : [],
       technologies: technologies ? JSON.parse(technologies) : [],
       order: parseInt(order) || 0
@@ -293,10 +294,10 @@ router.put('/experiences/:id', async (req, res) => {
     const updateData = {
       company,
       position,
-      location,
-      startDate: new Date(startDate),
-      endDate: endDate ? new Date(endDate) : null,
-      description,
+      location: location || '',
+      startDate: startDate, // Keep as string
+      endDate: endDate || '',
+      description: description || '',
       achievements: achievements ? JSON.parse(achievements) : experience.achievements,
       technologies: technologies ? JSON.parse(technologies) : experience.technologies,
       order: parseInt(order) || experience.order

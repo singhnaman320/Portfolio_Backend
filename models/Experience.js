@@ -13,20 +13,22 @@ const experienceSchema = new mongoose.Schema({
   },
   location: {
     type: String,
-    required: true,
-    trim: true
+    required: false,
+    trim: true,
+    default: ''
   },
   startDate: {
-    type: Date,
+    type: String, // Changed to String for flexible date formats
     required: true
   },
   endDate: {
-    type: Date,
-    default: null // null means current job
+    type: String, // Changed to String for flexible date formats
+    default: '' // empty string means current job or not specified
   },
   description: {
     type: String,
-    required: true
+    required: false,
+    default: ''
   },
   achievements: [{
     type: String,
