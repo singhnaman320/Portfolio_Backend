@@ -1,21 +1,34 @@
 const mongoose = require('mongoose');
 
 const skillSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
   category: {
     type: String,
     required: true,
     trim: true,
     enum: ['Frontend', 'Backend', 'Database', 'DevOps/Cloud', 'Tools', 'Languages', 'Other']
   },
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
   proficiency: {
     type: String,
     required: true,
-    enum: ['Beginner', 'Intermediate', 'Advanced', 'Expert']
+    enum: ['Basic', 'Intermediate', 'Advanced', 'Expert']
+  },
+  level: {
+    type: Number,
+    required: true,
+    min: 0,
+    max: 100,
+    default: 50
+  },
+  yearsOfExperience: {
+    type: Number,
+    required: true,
+    min: 0,
+    default: 1
   },
   icon: {
     type: String,

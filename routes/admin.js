@@ -349,30 +349,30 @@ router.get('/skills', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
 // @route   POST /api/admin/skills
 // @desc    Create new skill
 // @access  Private
 router.post('/skills', [
-  body('category').isIn(['Frontend', 'Backend', 'Database', 'DevOps/Cloud', 'Tools', 'Languages', 'Other']).withMessage('Valid category is required'),
   body('name').trim().isLength({ min: 1 }).withMessage('Skill name is required'),
-  body('proficiency').isIn(['Beginner', 'Intermediate', 'Advanced', 'Expert']).withMessage('Valid proficiency is required')
+  body('category').isIn(['Frontend', 'Backend', 'Database', 'DevOps/Cloud', 'Tools', 'Languages', 'Other']).withMessage('Valid category is required'),
+  body('proficiency').isIn(['Basic', 'Intermediate', 'Advanced', 'Expert']).withMessage('Valid proficiency is required'),
+  body('level').isInt({ min: 0, max: 100 }).withMessage('Level must be between 0 and 100'),
+  body('yearsOfExperience').isInt({ min: 0 }).withMessage('Years of experience must be a positive number')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ 
-        message: 'Validation failed', 
-        errors: errors.array() 
-      });
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    const { category, name, proficiency, icon, order } = req.body;
+    const { name, category, proficiency, level, yearsOfExperience, icon, order } = req.body;
 
     const skill = new Skill({
-      category,
       name,
+      category,
       proficiency,
+      level: parseInt(level),
+      yearsOfExperience: parseInt(yearsOfExperience),
       icon: icon || '',
       order: parseInt(order) || 0
     });
@@ -389,19 +389,32 @@ router.post('/skills', [
 // @route   PUT /api/admin/skills/:id
 // @desc    Update skill
 // @access  Private
-router.put('/skills/:id', async (req, res) => {
+router.put('/skills/:id', [
+  body('name').trim().isLength({ min: 1 }).withMessage('Skill name is required'),
+  body('category').isIn(['Frontend', 'Backend', 'Database', 'DevOps/Cloud', 'Tools', 'Languages', 'Other']).withMessage('Valid category is required'),
+  body('proficiency').isIn(['Basic', 'Intermediate', 'Advanced', 'Expert']).withMessage('Valid proficiency is required'),
+  body('level').isInt({ min: 0, max: 100 }).withMessage('Level must be between 0 and 100'),
+  body('yearsOfExperience').isInt({ min: 0 }).withMessage('Years of experience must be a positive number')
+], async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const skill = await Skill.findById(req.params.id);
     if (!skill) {
       return res.status(404).json({ message: 'Skill not found' });
     }
 
-    const { category, name, proficiency, icon, order } = req.body;
+    const { name, category, proficiency, level, yearsOfExperience, icon, order } = req.body;
 
     Object.assign(skill, {
-      category,
       name,
+      category,
       proficiency,
+      level: parseInt(level),
+      yearsOfExperience: parseInt(yearsOfExperience),
       icon: icon || skill.icon,
       order: parseInt(order) || skill.order
     });
