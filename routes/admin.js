@@ -76,4 +76,23 @@ router.put('/contacts/:id/reply', [
   }
 });
 
+// @route   DELETE /api/admin/contacts/:id
+// @desc    Delete contact message
+// @access  Private
+router.delete('/contacts/:id', async (req, res) => {
+  try {
+    const contact = await Contact.findById(req.params.id);
+    if (!contact) {
+      return res.status(404).json({ message: 'Contact not found' });
+    }
+
+    await Contact.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'Contact deleted successfully' });
+  } catch (error) {
+    console.error('Delete contact error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
